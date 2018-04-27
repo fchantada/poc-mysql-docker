@@ -1,0 +1,1 @@
+mysql -u root -p$MYSQL_ROOT_PASSWORD -e"GRANT REPLICATION SLAVE ON *.* TO 'rpl_user'@'%' IDENTIFIED BY '123456';"
