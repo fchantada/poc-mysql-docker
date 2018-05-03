@@ -1,7 +1,8 @@
 version: "3.3"
 
-volumes:
-  stack_home:
+#volumes:
+  #vln-mn1-userdir:
+  #vln-mn2-userdir:
 
 services:
    mysql-node1:
@@ -9,10 +10,10 @@ services:
      container_name: mysql-node1
      hostname: mysql-node1
      restart: always
-     volumes:
-      - type: volume
-        source: stack_home
-        target: /home/
+     #volumes:
+      #- type: volume
+       # source: vln-mn1-userdir
+        #target: /var/lib/mysql/
      environment:
        MYSQL_ROOT_PASSWORD: Qwerty1234
        MYSQL_DATABASE: example-db
@@ -31,10 +32,10 @@ services:
      restart: always
      depends_on:
       - mysql-node1
-     volumes:
-      - type: volume
-        source: stack_home
-        target: /home/
+     #volumes:
+      #- type: volume
+       # source: vln-mn2-userdir
+        #target: /var/lib/mysql
      environment:
        MYSQL_ROOT_PASSWORD: Qwerty1234
        MYSQL_DATABASE: example-db
