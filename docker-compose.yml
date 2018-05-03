@@ -1,18 +1,47 @@
 version: "3.3"
 
+volumes:
+  stack_home:
+
 services:
    mysql-node1:
      build: ./mysql-node1
      container_name: mysql-node1
      hostname: mysql-node1
      restart: always
+     volumes:
+      - type: volume
+        source: stack_home
+        target: /home/
      environment:
        MYSQL_ROOT_PASSWORD: Qwerty1234
-       MYSQL_DATABASE: example
+       MYSQL_DATABASE: example-db
        MYSQL_USER: example_user
        MYSQL_PASSWORD: 123456
      ports:
       - target: 3306
         published: 13306
+        protocol: tcp
+        mode: host
+
+   mysql-node2:
+     build: ./mysql-node2
+     container_name: mysql-node2
+     hostname: mysql-node2
+     restart: always
+     depends_on:
+      - mysql-node1
+     volumes:
+      - type: volume
+        source: stack_home
+        target: /home/
+     environment:
+       MYSQL_ROOT_PASSWORD: Qwerty1234
+       MYSQL_DATABASE: example-db
+       MYSQL_USER: example_user
+       MYSQL_PASSWORD: 123456
+     ports:
+      - target: 3306
+        published: 23306
         protocol: tcp
         mode: host
