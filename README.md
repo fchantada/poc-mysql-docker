@@ -2,13 +2,16 @@
 
 ## Prerequisites
 
-+ Vagrant 2.2.4 or highter.
-+ VirtualBox 6.0 or highter.
++ Vagrant 2.2.4 or higher.
++ Hypervisor: 
+    + VirtualBox 6.0 or higher.
+    + Hyper-V 10 or higher.
++ Mysql client (example: MySQL Workbench)
 
 
 ## How to use?
 
-For start stack
+For start Sandbox
 ```
   $ vagrant up
 ```
@@ -25,8 +28,29 @@ Connection String for connect to MYSQL Node 2 (default parameters):
 + user: example_user 
 + pass: 123456
 
-For down stack
+For destroy Sandbox
 
 ```
-  $ vagrant down
+  $ vagrant destroy
+```
+
+## Another Vagrant Commands
+
+Stop Sandbox
+```
+  $ vagrant halt
+```
+Connect to Sandbox via ssh
+```
+  $ vagrant ssh
+```
+
+Reconfigure Sandbox after a source code change
+```
+  $ vagrant provision
+```
+
+Reload Sandbox
+```
+  $ vagrant reload
 ```

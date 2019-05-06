@@ -1,7 +1,7 @@
 Vagrant.configure("2") do |config|
   config.vm.define "linux" , autostart: true, primary: true do |db|
-    config.vm.box = "ubuntu/bionic64"
-    config.vm.box_version = "20190503.0.0"
+    config.vm.box = "centos/7"
+    config.vm.box_version = "1902.01"
     # MYSQL Node 1
     config.vm.network "forwarded_port", guest: 13306, host: 13306
     # MYSQL Node 2
@@ -16,13 +16,21 @@ Vagrant.configure("2") do |config|
     vb.gui = false
   end
 
+  config.vm.provider "hyperv" do |vb|
+    vb.memory = "2048"
+    vb.cpus = 2
+    vb.vmname = "UbuntuVagrant"
+  end
+
   config.vm.provision "shell", inline: <<-SHELL
-    sudo apt-get update
-    sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose -y
+    sudo yum install yum-utils device-mapper-persistent-data lvm2 -y
+    sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    sudo yum install docker-ce docker-ce-cli containerd.io -y
+    sudo systemctl start docker
+    sudo yum install epel-release -y
+    sudo yum install python-pip -y
+    sudo pip install docker-compose
+    sudo yum install git -y
     git clone https://github.com/fchantada/poc-mysql-docker
     sudo docker-compose -f /home/vagrant/poc-mysql-docker/docker-compose.yml -p poc-mysql-docker up -d --remove-orphans
   SHELL
