@@ -1,13 +1,32 @@
-# MYSQL Replication - Master/Master
+# Docker MYSQL Replication - Master/Master
 
-## Scope
+## Prerequisites
+
++ Vagrant 2.2.4 or highter.
++ VirtualBox 6.0 or highter.
 
 
 ## How to use?
 
-( Assuming that you already have docker, docker-engine(running), docker-compose installed )
+For start stack
+```
+  $ vagrant up
+```
+
+Connection String for connect to MYSQL Node 1 (default parameters): 
++ host: 127.0.0.1 (localhost)
++ port: 13306
++ user: example_user 
++ pass: 123456
+
+Connection String for connect to MYSQL Node 2 (default parameters): 
++ host: 127.0.0.1 (localhost)
++ port: 23306
++ user: example_user 
++ pass: 123456
+
+For down stack
 
 ```
-  $ git clone https://github.com/fchantada/poc-mysql-docker
-  $ docker-compose up -d
+  $ vagrant down
 ```
