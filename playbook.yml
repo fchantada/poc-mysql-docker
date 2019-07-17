@@ -1,0 +1,133 @@
+---
+- name: Server Provisioning
+  gather_facts: False
+  hosts: all
+  order: sorted
+  become: true
+  tags:
+  - provisioning 
+
+  tasks:
+    - name: Install Docker key
+      apt_key: 
+        url: https://download.docker.com/linux/ubuntu/gpg 
+
+    - name: Add Docker Apt Repository
+      apt_repository:
+        filename: docker-ce
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+
+    - name: Install base packages
+      apt:
+        name : "{{item.name}}"
+        state : "{{item.state}}"
+        update_cache : yes           
+      vars:
+        packages:
+        - name: wget
+          state: present
+        - name: docker-ce
+          state: present           
+        - name: python-pip
+          state: present
+        - name: python3-pip
+          state: present           
+      with_items: "{{ packages }}"
+
+    - name: Enable Docker Service
+      systemd:
+        name: docker.service
+        enabled: true
+        state: started
+
+    - name: Install Python's PIP
+      pip:
+        name: "{{item.name}}"
+        state: "{{item.state}}"
+      vars:
+        packages:
+        - name: docker
+          state: present
+      with_items: "{{ packages }}"
+
+    - name: Add vagrant user to dockerd group
+      user:
+        append: "yes"
+        groups: "docker"
+        name: "{{default_user}}"
+
+- name: Docker Build
+  gather_facts: false
+  hosts: all
+  order: sorted
+  become: yes
+  tags:
+  - build
+
+  tasks:
+    - name: Git Clone
+      git:
+        repo: "https://github.com/fchantada/poc-mysql-docker"
+        dest: "./linux-containers"
+        depth: 1
+        version: master
+
+    - name: MYSQL Image Node 1
+      docker_image:
+        path: "./mysql-node1"
+        name: "mysql-node1"
+        tag: "latest"
+        force: "true"
+        push: "false"
+        pull: "true"
+    
+    - name: MYSQL Image Node 2
+      docker_image:
+        path: "./mysql-node1"
+        name: "mysql-node1"
+        tag: "latest"
+        force: "true"
+        push: "false"
+        pull: "true"
+
+- name: MYSQL
+  gather_facts: false
+  hosts: all
+  become: yes
+  order: sorted
+  tags:
+  - mysql
+
+  tasks:
+
+  - name: MYSQL Node 1
+    docker_container:
+      name: "mysql-node1"
+      image: "mysql-node1"
+      pull: "false"
+      recreate: "false"
+      state: "started"
+      env:
+        MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
+        MYSQL_DATABASE: "{{ MYSQL_DATABASE }}"
+        MYSQL_USER: "{{ MYSQL_USER }}"
+        MYSQL_PASSWORD:  "{{ MYSQL_PASSWORD }}"
+      restart_policy: "unless-stopped"
+      published_ports:
+        - "0.0.0.0:13306:3306" 
+
+  - name: MYSQL Node 2
+    docker_container:
+      name: "mysql-node2"
+      image: "mysql-node2"
+      pull: "false"
+      recreate: "false"
+      state: "started"
+      env:
+        MYSQL_ROOT_PASSWORD: "{{ MYSQL_ROOT_PASSWORD }}"
+        MYSQL_DATABASE: "{{ MYSQL_DATABASE }}"
+        MYSQL_USER: "{{ MYSQL_USER }}"
+        MYSQL_PASSWORD:  "{{ MYSQL_PASSWORD }}"
+      restart_policy: "unless-stopped"
+      published_ports:
+        - "0.0.0.0:23306:3306" 
